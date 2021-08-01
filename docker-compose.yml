@@ -2,6 +2,6 @@ version: '3'
 services:
   python:
     build: .
-    container_name: python
+    container_name: live_chat_bans
     volumes:
       - ./app:/opt/app

@@ -1,10 +1,10 @@
 # 任意のイメージを取得
-FROM python:3.10-rc-slim-buster
+FROM python
 
 RUN ln -sf /usr/share/zoneinfo/Asia/Tokyo /etc/localtime
 
 RUN python -m pip install --upgrade pip
-RUN pip install python-dotenv
+RUN pip install python-dotenv google-api-python-client oauth2client httplib2
 
 WORKDIR /opt/app
 

@@ -1,17 +1,32 @@
-# Template Python on Docker
+# YoutubeAPI_liveChatBans
 
-## 使い方
+### Request
 
-1. Dockerfileのimageを変更する。
-2. 必要に応じてDockerfileにpipを書く。
-3. 必要に応じてdocker-compose.ymlを修正する。
-4. 下記実行。
-    ``` sh
-    docker-compose build
-    docker-compose up
-    ```
+[ここ](https://developers.google.cn/youtube/v3/live/docs/liveChatBans#resource-representation)から取得。
+
+``` json
+{
+  "kind": "youtube#liveChatBan",
+  "etag": etag, # videoの実行結果 : video['items'][0]['etag']
+  "id": string, # videoの実行結果 : video['items'][0]['id']
+  "snippet": {
+    "liveChatId": string, # video['items'][0]['liveStreamingDetails']['activeLiveChatId']
+    "type": string,       # 'permanent' or 'temporary'
+    "banDurationSeconds": unsigned long, # typeが'temporary'のときだけ有効。デフォルトは300。
+    "bannedUserDetails": {
+      "channelId": string
+    }
+  }
+}
+```
+
+#### video liveStreamingDetails
+
+``` json
+
+```
 
 ## 参考
 
-- [Qiita:Docker を使う（python のイメージで色々確認してみる）](https://qiita.com/landwarrior/items/fd918da9ebae20486b81)
-- [Future Tech Blog:仕事でPythonコンテナをデプロイする人向けのDockerfile (1): オールマイティ編](https://future-architect.github.io/articles/20200513/)
+- [ドキュメント:liveChatBans](https://googleapis.github.io/google-api-python-client/docs/dyn/youtube_v3.liveChatBans.html)
+- [LiveChatBans:insert :YoutubeAPI](https://developers.google.cn/youtube/v3/live/docs/liveChatBans/insert)
