@@ -138,3 +138,6 @@ app/config/client_secret.json
 
 # App
 tmp/*
+
+# local
+Memo.md

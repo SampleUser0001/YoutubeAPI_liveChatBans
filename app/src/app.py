@@ -91,8 +91,7 @@ def live_chat_ban(request):
   指定したチャンネルIDのユーザをBANする。
   """
   youtube.liveChatBans().insert(
-    part=request,
-    body=request
+    part=request
   ).execute()
 
 def get_video_info(video_id):
@@ -104,36 +103,42 @@ def get_video_info(video_id):
     id=video_id
   ).execute()
 
-def convert_to_ban_request(video, ban_channel_id):
+def convert_to_ban_request(live_chat_id, ban_channel_id):
   """
-  動画情報からliveChatBansの引数に変換する
+  liveChatBansの引数を生成する
   
   Parameter
   ----
-  video : dict
-    動画情報
+  live_chat_ban : string
+    チャットID
   ban_channel_id : string
     BAN対象のチャンネルID
+    
+  Return
+  ----
+  dict
+    liveChatBansに渡す引数
   """
 
   return_dict = {}
-#  return_dict['kind'] = 'youtube#liveChatBan'
-#  return_dict['etag'] = video['items'][0]['etag']
-#  return_dict['id'] = video['items'][0]['id']
 
   snippet = {}
-  snippet['liveChatId'] = video['items'][0]['liveStreamingDetails']['activeLiveChatId']
-  snippet['type'] = 'permanent'
   
   bannedUserDetails = {}
-  bannedUserDetails['channel_id'] = ban_channel_id
+  bannedUserDetails['channelId'] = ban_channel_id
+  # bannedUserDetails['channelUrl'] = 
+  # bannedUserDetails['displayName'] = 
+  # bannedUserDetails['profileImageUrl'] = 
+  
   
   snippet['bannedUserDetails'] = bannedUserDetails
+  snippet['liveChatId'] = live_chat_id
+  snippet['type'] = 'PERMANENT'
+  
   return_dict['snippet'] = snippet
   
   return return_dict
-  
-  
+
 if __name__ == '__main__':
   logger.info('Start')
   
@@ -142,10 +147,14 @@ if __name__ == '__main__':
   
   youtube = get_authenticated_service(OAUTH_FILE)
   video_info = get_video_info(VIDEO_ID)
-  logger.info(video_info)
+  logger.debug(video_info)
   
-  ban_request = json.dumps(convert_to_ban_request(video_info, CHANNEL_ID))
-  logger.info(ban_request)
+  ban_request = convert_to_ban_request( \
+    video_info['items'][0]['liveStreamingDetails']['activeLiveChatId'], \
+    CHANNEL_ID))
+  
+  logger.debug(ban_request)
+  
   live_chat_ban(ban_request)
   
   logger.info('Finish')
