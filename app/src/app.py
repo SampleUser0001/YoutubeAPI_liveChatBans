@@ -91,7 +91,8 @@ def live_chat_ban(request):
   指定したチャンネルIDのユーザをBANする。
   """
   youtube.liveChatBans().insert(
-    part=request
+    part="snippet",
+    body=request
   ).execute()
 
 def get_video_info(video_id):
@@ -124,19 +125,25 @@ def convert_to_ban_request(live_chat_id, ban_channel_id):
 
   snippet = {}
   
+  # https://www.googleapis.com/youtube/v3/liveChat/messagesで取得できる値
   bannedUserDetails = {}
   bannedUserDetails['channelId'] = ban_channel_id
-  # bannedUserDetails['channelUrl'] = 
-  # bannedUserDetails['displayName'] = 
-  # bannedUserDetails['profileImageUrl'] = 
-  
-  
+  # bannedUserDetails['channelUrl'] = 'http://www.youtube.com/channel/' + ban_channel_id
+  # bannedUserDetails['displayName'] = 'User Sample 2'
+  # bannedUserDetails['profileImageUrl'] = 'https://yt3.ggpht.com/ytc/AKedOLSO1cd-PcRVi9yuOYH-Z9ZH3ZyN3X_FdASNAaBrQa5Us2cJ1FcCvGIzIkD_OKxM=s88-c-k-c0x00ffffff-no-rj'
+
   snippet['bannedUserDetails'] = bannedUserDetails
   snippet['liveChatId'] = live_chat_id
+  # 指定したユーザを永続的に非表示にする。「非表示のユーザー」に登録される。
   snippet['type'] = 'PERMANENT'
   
-  return_dict['snippet'] = snippet
+  # 指定したユーザを一時的に非表示にする。banDurationSecondsで指定した秒数、投稿不可にする。
+  # snippet['type'] = 'TEMPORARY'
+  # snippet['banDurationSeconds'] = '30'
   
+  # return snippet
+
+  return_dict['snippet'] = snippet
   return return_dict
 
 if __name__ == '__main__':
@@ -151,7 +158,7 @@ if __name__ == '__main__':
   
   ban_request = convert_to_ban_request( \
     video_info['items'][0]['liveStreamingDetails']['activeLiveChatId'], \
-    CHANNEL_ID))
+    CHANNEL_ID)
   
   logger.debug(ban_request)
   
