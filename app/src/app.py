@@ -65,7 +65,8 @@ def get_authenticated_service(oauth_file):
   
   Parameter
   ----
-  oauth_file : 認証済みjsonファイルのファイルパス
+  oauth_file : string
+    認証済みjsonファイルのファイルパス
   
   Return
   ----
@@ -85,10 +86,19 @@ def get_authenticated_service(oauth_file):
   return build(YOUTUBE_API_SERVICE_NAME, YOUTUBE_API_VERSION,
     http=credentials.authorize(httplib2.Http()))
 
-# TODO 後で書く
 def live_chat_ban(request):
   """
   指定したチャンネルIDのユーザをBANする。
+  
+  Parameter
+  ----
+  request : dict
+    BAN実行のためのリクエスト情報
+    
+  Return
+  ----
+  None
+    なし
   """
   youtube.liveChatBans().insert(
     part="snippet",
@@ -98,6 +108,17 @@ def live_chat_ban(request):
 def get_video_info(video_id):
   """
   動画情報を取得する。
+  
+  Parameter
+  ----
+  video_id : string
+    動画ID
+  
+  Return
+  ----
+  dict
+    動画情報
+  
   """
   return youtube.videos().list(
     part='liveStreamingDetails',
@@ -128,9 +149,6 @@ def convert_to_ban_request(live_chat_id, ban_channel_id):
   # https://www.googleapis.com/youtube/v3/liveChat/messagesで取得できる値
   bannedUserDetails = {}
   bannedUserDetails['channelId'] = ban_channel_id
-  # bannedUserDetails['channelUrl'] = 'http://www.youtube.com/channel/' + ban_channel_id
-  # bannedUserDetails['displayName'] = 'User Sample 2'
-  # bannedUserDetails['profileImageUrl'] = 'https://yt3.ggpht.com/ytc/AKedOLSO1cd-PcRVi9yuOYH-Z9ZH3ZyN3X_FdASNAaBrQa5Us2cJ1FcCvGIzIkD_OKxM=s88-c-k-c0x00ffffff-no-rj'
 
   snippet['bannedUserDetails'] = bannedUserDetails
   snippet['liveChatId'] = live_chat_id
@@ -141,8 +159,6 @@ def convert_to_ban_request(live_chat_id, ban_channel_id):
   # snippet['type'] = 'TEMPORARY'
   # snippet['banDurationSeconds'] = '30'
   
-  # return snippet
-
   return_dict['snippet'] = snippet
   return return_dict
 
@@ -152,16 +168,18 @@ if __name__ == '__main__':
   logger.info('video_id : %s' % VIDEO_ID)
   logger.info('ban channel_id : %s' % CHANNEL_ID)
   
+  # Youtube接続インスタンス取得
   youtube = get_authenticated_service(OAUTH_FILE)
   video_info = get_video_info(VIDEO_ID)
   logger.debug(video_info)
-  
+
+  # BANリクエストの引数を生成する。  
   ban_request = convert_to_ban_request( \
     video_info['items'][0]['liveStreamingDetails']['activeLiveChatId'], \
     CHANNEL_ID)
-  
   logger.debug(ban_request)
   
+  # BAN実行
   live_chat_ban(ban_request)
   
   logger.info('Finish')
